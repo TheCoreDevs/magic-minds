@@ -11,17 +11,15 @@ contract MagicMinds is Ownable, IERC2981, ERC721 {
     bool private _onlyMagicList;
     bool private _mintingEnabled;
 
-    address private EIP2981RoyaltyReceiver;
     uint private EIP2981RoyaltyPercent;
 
     uint private mintPrice;
 
     mapping (address => uint8) private amountMinted;
 
-    constructor(uint _mintPriceInWei, uint _royalty, address _royaltyReceiver) {
+    constructor(uint _mintPriceInWei, uint _royalty) {
         mintPrice = _mintPriceInWei;
         EIP2981RoyaltyPercent = _royalty;
-        EIP2981RoyaltyReceiver = _royaltyReceiver;
     }
 
     function mint(uint256 amount) external payable {
@@ -82,11 +80,7 @@ contract MagicMinds is Ownable, IERC2981, ERC721 {
      */
     function royaltyInfo(uint tokenId, uint salePrice) external view returns(address receiver, uint256 royaltyAmount) {
         require(_exists(tokenId), "Royality querry for non-existant token!");
-        return(EIP2981RoyaltyReceiver, salePrice * EIP2981RoyaltyPercent / 10000);
-    }
-
-    function setRoyaltyReceiver(address addr) external onlyOwner {
-        EIP2981RoyaltyReceiver = addr;
+        return(owner(), salePrice * EIP2981RoyaltyPercent / 10000);
     }
 
     /**
