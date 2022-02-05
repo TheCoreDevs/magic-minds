@@ -5,6 +5,7 @@ pragma solidity ^0.8.11;
 import "./IERC721.sol";
 import "./IERC721Receiver.sol";
 import "./IERC721Metadata.sol";
+import "./Ownable.sol";
 import "./Address.sol";
 import "./Strings.sol";
 import "./ERC165.sol";
@@ -14,14 +15,14 @@ import "./ERC165.sol";
  * the Metadata extension.
  * Made for efficiancy!
  */
-contract ERC721 is ERC165, IERC721, IERC721Metadata {
+contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     using Address for address;
     using Strings for uint256;
 
     uint16 public totalSupply;
 
-    address private constant _openseaContract = 0x5206e78b21Ce315ce284FB24cf05e0585A93B1d9; // rinkeby
-    address private constant _raribleContract = 0xd4a57a3bD3657D0d46B4C5bAC12b3F156B9B886b; // rinkeby
+    address private _openseaContract;
+    address private _raribleContract;
 
     string baseURI;
 
@@ -87,6 +88,10 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata {
         return string(abi.encodePacked(baseURI, tokenId.toString(), ".json"));
     }
 
+    function setBaseURI(string memory uri) external onlyOwner {
+        baseURI = uri;
+    }
+
     /**
      * @dev See {IERC721-approve}.
      */
@@ -126,6 +131,14 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata {
             operator ==  _openseaContract ||
             operator == _raribleContract ||
             _operatorApprovals[owner][operator];
+    }
+
+    function setOpenseaContract(address addr) external onlyOwner {
+        _openseaContract = addr;
+    }
+
+    function setRaribleContract(address addr) external onlyOwner {
+        _raribleContract = addr;
     }
 
     /**

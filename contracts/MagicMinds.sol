@@ -3,7 +3,6 @@ pragma solidity ^0.8.11;
 
 import "./ERC721.sol";
 import "./ECDSA.sol";
-import "./Ownable.sol";
 import "./IERC2981.sol";
 
 contract MagicMinds is Ownable, IERC2981, ERC721 {
@@ -127,9 +126,5 @@ contract MagicMinds is Ownable, IERC2981, ERC721 {
     function togglePublicSale() external onlyOwner {
         _onlyMagicList = false;
         _mintingEnabled = !_mintingEnabled;
-    }
-
-    function setBaseURI(string memory uri) external onlyOwner {
-        baseURI = uri;
     }
 }
