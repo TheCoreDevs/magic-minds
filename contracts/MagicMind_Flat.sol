@@ -979,7 +979,6 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
 
 // File: contracts/MagicMind.sol
 
-
 contract MagicMind is Ownable, IERC2981, ERC721 {
     
     bool private _onlyMagicList;
@@ -987,21 +986,24 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
 
     uint private EIP2981RoyaltyPercent;
 
-    uint private mintPrice;
-
     mapping (address => uint8) private amountMinted;
 
-    constructor(uint _mintPriceInWei, uint _royalty, string memory _tempBaseURI) {
-        mintPrice = _mintPriceInWei;
+    constructor(uint _royalty, string memory _tempBaseURI) {
         EIP2981RoyaltyPercent = _royalty;
         baseURI = _tempBaseURI;
+    }
+    
+    function mintFromReserve(uint amount, address to) external onlyOwner {
+        uint x = totalSupply;
+        require(x >= 9_500 && x + amount < 10_000)
+        _mint(amount, to)
     }
 
     function mint(uint256 amount) external payable {
         require(_mintingEnabled, "Minting is not enabled!");
         require(amount <= 20 && amount != 0, "Invalid request amount!");
-        require(totalSupply + amount < 10_000, "Request exceeds max supply!");
-        require(msg.value == mintPrice * amount, "ETH Amount is not correct!");
+        require(totalSupply + amount < 9_500, "Request exceeds max supply!");
+        require(msg.value == amount * 89e15, "ETH Amount is not correct!");
 
         _mint(amount, msg.sender);
     }
@@ -1011,7 +1013,7 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
         require(checkSig(msg.sender, sig), "User not whitelisted!");
         uint256 m = amount + amountMinted[msg.sender];
         require(m <= 10 && m != 0, "Request exceeds max per wallet!");
-        require(msg.value == mintPrice * amount, "ETH Amount is not correct!");
+        require(msg.value == amount * 69e15, "ETH Amount is not correct!");
 
         amountMinted[msg.sender] += uint8(amount);
         _mint(amount, msg.sender);
@@ -1040,10 +1042,6 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
      */
     function isMinting() external view returns(bool) {
         return _mintingEnabled;
-    }
-
-    function getMintPriceInWei() external view returns(uint) {
-        return mintPrice;
     }
 
     /**
@@ -1080,10 +1078,6 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
 
     function withdraw() onlyOwner external {
         payable(msg.sender).transfer(address(this).balance);
-    }
-
-    function setMintPrice(uint priceInWei) external onlyOwner {
-        mintPrice = priceInWei;
     }
 
     /**
