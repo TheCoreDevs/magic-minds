@@ -17,9 +17,10 @@ contract MagicMinds is Ownable, IERC2981, ERC721 {
 
     mapping (address => uint8) private amountMinted;
 
-    constructor(uint _mintPriceInWei, uint _royalty) {
+    constructor(uint _mintPriceInWei, uint _royalty, string memory _tempBaseURI) {
         mintPrice = _mintPriceInWei;
         EIP2981RoyaltyPercent = _royalty;
+        baseURI = _tempBaseURI;
     }
 
     function mint(uint256 amount) external payable {
@@ -125,5 +126,9 @@ contract MagicMinds is Ownable, IERC2981, ERC721 {
     function togglePublicSale() external onlyOwner {
         _onlyMagicList = false;
         _mintingEnabled = !_mintingEnabled;
+    }
+
+    function setBaseURI(string memory uri) external onlyOwner {
+        baseURI = uri;
     }
 }

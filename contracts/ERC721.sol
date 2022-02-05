@@ -23,6 +23,8 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata {
     address private constant _openseaContract = 0x5206e78b21Ce315ce284FB24cf05e0585A93B1d9; // rinkeby
     address private constant _raribleContract = 0xd4a57a3bD3657D0d46B4C5bAC12b3F156B9B886b; // rinkeby
 
+    string baseURI;
+
     // Mapping from token ID to owner address
     mapping(uint256 => address) internal _owners;
 
@@ -82,7 +84,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata {
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
-        return string(abi.encodePacked("ipfs://<CID>/", tokenId.toString()));
+        return string(abi.encodePacked(baseURI, tokenId.toString(), ".json"));
     }
 
     /**
