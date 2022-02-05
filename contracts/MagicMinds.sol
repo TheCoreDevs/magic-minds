@@ -25,7 +25,7 @@ contract MagicMinds is Ownable, IERC2981, ERC721 {
 
     function mint(uint256 amount) external payable {
         require(_mintingEnabled, "Minting is not enabled!");
-        require(amount <= 20, "Amount exceeds max per batch");
+        require(amount <= 20 && amount != 0, "Invalid request amount!");
         require(totalSupply + amount < 10_000, "Request exceeds max supply!");
         require(msg.value == mintPrice * amount, "ETH Amount is not correct!");
 
@@ -35,7 +35,8 @@ contract MagicMinds is Ownable, IERC2981, ERC721 {
     function preMint(bytes calldata sig, uint256 amount) external payable {
         require(_onlyMagicList, "Minting is not enabled!");
         require(checkSig(msg.sender, sig), "User not whitelisted!");
-        require(amount + amountMinted[msg.sender] <= 10, "Request exceeds max per wallet!");
+        uint256 m = amount + amountMinted[msg.sender];
+        require(m <= 10 && m != 0, "Request exceeds max per wallet!");
         require(msg.value == mintPrice * amount, "ETH Amount is not correct!");
 
         amountMinted[msg.sender] += uint8(amount);
