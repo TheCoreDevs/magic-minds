@@ -2,10 +2,6 @@
 
 pragma solidity ^0.8.11;
 
-/**
- * Source: Openzeppelin
- */
-
 import "./IERC165.sol";
 
 /**
