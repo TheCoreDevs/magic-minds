@@ -5,7 +5,7 @@ import "./ERC721.sol";
 import "./ECDSA.sol";
 import "./IERC2981.sol";
 
-contract MagicMinds is Ownable, IERC2981, ERC721 {
+contract MagicMind is Ownable, IERC2981, ERC721 {
     
     bool private _onlyMagicList;
     bool private _mintingEnabled;

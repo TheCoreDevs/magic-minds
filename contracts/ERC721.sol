@@ -69,7 +69,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
      * @dev See {IERC721Metadata-name}.
      */
     function name() public view virtual override returns (string memory) {
-        return "Magic Minds";
+        return "Magic Mind";
     }
 
     /**

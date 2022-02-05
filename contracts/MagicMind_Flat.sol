@@ -977,10 +977,10 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
 
 }
 
-// File: contracts/MagicMinds.sol
+// File: contracts/MagicMind.sol
 
 
-contract MagicMinds is Ownable, IERC2981, ERC721 {
+contract MagicMind is Ownable, IERC2981, ERC721 {
     
     bool private _onlyMagicList;
     bool private _mintingEnabled;
