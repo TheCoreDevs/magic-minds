@@ -21,8 +21,8 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
     
     function mintFromReserve(uint amount, address to) external onlyOwner {
         uint x = totalSupply;
-        require(x >= 9_500 && x + amount < 10_000)
-        _mint(amount, to)
+        require(x >= 9_500 && x + amount < 10_000);
+        _mint(amount, to);
     }
 
     function mint(uint256 amount) external payable {
