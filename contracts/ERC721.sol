@@ -23,6 +23,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
 
     address private _openseaContract;
     address private _raribleContract;
+    address private _looksRareContract;
 
     string baseURI;
 
@@ -51,7 +52,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     /**
      * @dev See {IERC721-balanceOf}.
      */
-    function balanceOf(address owner) public view virtual override returns (uint256) {
+    function balanceOf(address owner) public view returns (uint256) {
         require(owner != address(0), "ERC721: balance query for the zero address");
         return _balances[owner];
     }
@@ -59,7 +60,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     /**
      * @dev See {IERC721-ownerOf}.
      */
-    function ownerOf(uint256 tokenId) public view virtual override returns (address) {
+    function ownerOf(uint256 tokenId) public view returns (address) {
         address owner = _owners[tokenId];
         require(owner != address(0), "ERC721: owner query for nonexistent token");
         return owner;
@@ -68,21 +69,21 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     /**
      * @dev See {IERC721Metadata-name}.
      */
-    function name() public view virtual override returns (string memory) {
+    function name() public pure returns (string memory) {
         return "Magic Mind";
     }
 
     /**
      * @dev See {IERC721Metadata-symbol}.
      */
-    function symbol() public view virtual override returns (string memory) {
+    function symbol() public pure returns (string memory) {
         return "MM";
     }
 
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
-    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+    function tokenURI(uint256 tokenId) public view returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
         return string(abi.encodePacked(baseURI, tokenId.toString(), ".json"));
@@ -95,7 +96,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     /**
      * @dev See {IERC721-approve}.
      */
-    function approve(address to, uint256 tokenId) public virtual override {
+    function approve(address to, uint256 tokenId) public {
         address owner = _owners[tokenId];
         require(to != owner, "ERC721: approval to current owner");
 
@@ -110,7 +111,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     /**
      * @dev See {IERC721-getApproved}.
      */
-    function getApproved(uint256 tokenId) public view virtual override returns (address) {
+    function getApproved(uint256 tokenId) public view returns (address) {
         require(_exists(tokenId), "ERC721: approved query for nonexistent token");
 
         return _tokenApprovals[tokenId];
@@ -119,17 +120,18 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     /**
      * @dev See {IERC721-setApprovalForAll}.
      */
-    function setApprovalForAll(address operator, bool approved) public virtual override {
+    function setApprovalForAll(address operator, bool approved) public {
         _setApprovalForAll(msg.sender, operator, approved);
     }
 
     /**
      * @dev See {IERC721-isApprovedForAll}.
      */
-    function isApprovedForAll(address owner, address operator) public view virtual override returns (bool) {
+    function isApprovedForAll(address owner, address operator) public view returns (bool) {
         return
             operator ==  _openseaContract ||
             operator == _raribleContract ||
+            operator == _looksRareContract ||
             _operatorApprovals[owner][operator];
     }
 
@@ -141,6 +143,14 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
         _raribleContract = addr;
     }
 
+    function setLooksRareContract(address addr) external onlyOwner {
+        _looksRareContract = addr;
+    }
+
+    function getMarketplaceContracts() external view returns(address opensea, address rarible, address looksRare) {
+        return(_openseaContract, _raribleContract, _looksRareContract);
+    }
+
     /**
      * @dev See {IERC721-transferFrom}.
      */
@@ -148,7 +158,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
         address from,
         address to,
         uint256 tokenId
-    ) public virtual override {
+    ) public {
         //solhint-disable-next-line max-line-length
         require(_isApprovedOrOwner(msg.sender, tokenId), "ERC721: transfer caller is not owner nor approved");
 
@@ -162,7 +172,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
         address from,
         address to,
         uint256 tokenId
-    ) public virtual override {
+    ) public {
         safeTransferFrom(from, to, tokenId, "");
     }
 
@@ -174,7 +184,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
         address to,
         uint256 tokenId,
         bytes memory _data
-    ) public virtual override {
+    ) public {
         require(_isApprovedOrOwner(msg.sender, tokenId), "ERC721: transfer caller is not owner nor approved");
         _safeTransfer(from, to, tokenId, _data);
     }
