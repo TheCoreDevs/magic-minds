@@ -1,12 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-// File: contracts/Ownable.sol
-
 pragma solidity ^0.8.11;
 
-/**
- * Source: Openzeppelin
- */
+// File: contracts/Ownable.sol
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -19,6 +15,8 @@ pragma solidity ^0.8.11;
  * This module is used through inheritance. It will make available the modifier
  * `onlyOwner`, which can be applied to your functions to restrict their use to
  * the owner.
+ *
+ * Source: Openzeppelin
  */
 abstract contract Ownable {
     address private _owner;
