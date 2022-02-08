@@ -648,7 +648,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     address private _raribleContract;
     address private _looksRareContract;
 
-    string baseURI;
+    string private baseURI;
 
     // Mapping from token ID to owner address
     mapping(uint256 => address) internal _owners;
@@ -661,6 +661,14 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
 
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
+
+
+    constructor(address _opensea, address _rarible, address _looksRare, string memory _baseURI) {
+        _openseaContract = _opensea;
+        _raribleContract = _rarible;
+        _looksRareContract = _looksRare;
+        baseURI = _baseURI;
+    }
 
     /**
      * @dev See {IERC165-supportsInterface}.
@@ -997,9 +1005,14 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
 
     mapping (address => uint8) private amountMinted;
 
-    constructor(uint _royalty, string memory _tempBaseURI) {
+    constructor(
+        uint _royalty, 
+        address _openseaAddr,
+        address _raribleAddr,
+        address _looksRareAddr,
+        string memory _tempBaseURI
+    ) ERC721(_openseaAddr, _raribleAddr, _looksRareAddr, _tempBaseURI) {
         EIP2981RoyaltyPercent = _royalty;
-        baseURI = _tempBaseURI;
     }
     
     function mintFromReserve(uint amount, address to) external onlyOwner {

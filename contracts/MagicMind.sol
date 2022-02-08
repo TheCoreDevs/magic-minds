@@ -14,9 +14,14 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
 
     mapping (address => uint8) private amountMinted;
 
-    constructor(uint _royalty, string memory _tempBaseURI) {
+    constructor(
+        uint _royalty, 
+        address _openseaAddr,
+        address _raribleAddr,
+        address _looksRareAddr,
+        string memory _tempBaseURI
+    ) ERC721(_openseaAddr, _raribleAddr, _looksRareAddr, _tempBaseURI) {
         EIP2981RoyaltyPercent = _royalty;
-        baseURI = _tempBaseURI;
     }
     
     function mintFromReserve(uint amount, address to) external onlyOwner {

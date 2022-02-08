@@ -25,7 +25,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     address private _raribleContract;
     address private _looksRareContract;
 
-    string baseURI;
+    string private baseURI;
 
     // Mapping from token ID to owner address
     mapping(uint256 => address) internal _owners;
@@ -38,6 +38,14 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
 
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
+
+
+    constructor(address _opensea, address _rarible, address _looksRare, string memory _baseURI) {
+        _openseaContract = _opensea;
+        _raribleContract = _rarible;
+        _looksRareContract = _looksRare;
+        baseURI = _baseURI;
+    }
 
     /**
      * @dev See {IERC165-supportsInterface}.
