@@ -910,8 +910,9 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
         // Clear approvals from the previous owner
         _approve(address(0), tokenId);
 
-        _balances[from] -= 1;
-        _balances[to] += 1;
+        _balances[from]--;
+        _balances[to]++;
+        
         _owners[tokenId] = to;
 
         emit Transfer(from, to, tokenId);
