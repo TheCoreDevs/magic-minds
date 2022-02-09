@@ -708,7 +708,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
      * @dev See {IERC721Metadata-symbol}.
      */
     function symbol() public pure returns (string memory) {
-        return "MM";
+        return "MIND";
     }
 
     /**
