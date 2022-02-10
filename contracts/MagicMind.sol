@@ -125,4 +125,18 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
         _onlyMagicList = false;
         _mintingEnabled = !_mintingEnabled;
     }
+
+    function tokensOfOwner(address owner) external view returns(uint[] memory) {
+        uint[] memory tokens = new uint[](balanceOf(owner));
+        uint x;
+
+        for (uint i; i < totalSupply; i++) {
+            if (ownerOf(i) == owner) {
+                tokens[x] = i;
+                x++;
+            }
+        }
+
+        return tokens;
+    }
 }
