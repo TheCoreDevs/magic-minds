@@ -885,7 +885,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
      * Emits a {Transfer} event.
      */
     function _mint(uint256 amount, address to) internal {
-        uint tokenId = totalSupply;
+        uint tokenId = totalSupply + 1;
 
         _balances[to] += amount;
         
