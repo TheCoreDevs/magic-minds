@@ -680,6 +680,10 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
             super.supportsInterface(interfaceId);
     }
 
+    function getBaseURI() external view returns(string memory) {
+        return baseURI;
+    }
+
     /**
      * @dev See {IERC721-balanceOf}.
      */
@@ -885,11 +889,13 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
      * Emits a {Transfer} event.
      */
     function _mint(uint256 amount, address to) internal {
-        uint tokenId = totalSupply + 1;
+        uint tokenId = totalSupply;
 
         _balances[to] += amount;
         
         for (uint i; i < amount; i++) {
+            tokenId++;
+
             _owners[tokenId] = to;
             emit Transfer(address(0), to, tokenId);
 
@@ -897,8 +903,6 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
                 _checkOnERC721Received(address(0), to, tokenId, ""),
                 "ERC721: transfer to non ERC721Receiver implementer"
             );
-
-            tokenId++;
         }
 
         totalSupply += uint16(amount);
