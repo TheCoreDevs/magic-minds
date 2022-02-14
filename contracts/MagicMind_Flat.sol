@@ -1027,7 +1027,7 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
     function mint(uint256 amount) external payable {
         require(_mintingEnabled, "Minting is not enabled!");
         require(amount <= 20 && amount != 0, "Invalid request amount!");
-        require(totalSupply + amount < 10_000, "Request exceeds max supply!");
+        require(totalSupply + amount < 10_001, "Request exceeds max supply!");
         require(msg.value == amount * 89e15, "ETH Amount is not correct!");
 
         _mint(amount, msg.sender);
@@ -1123,9 +1123,10 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
 
     function tokensOfOwner(address owner) external view returns(uint[] memory) {
         uint[] memory tokens = new uint[](balanceOf(owner));
+        uint y = totalSupply + 1;
         uint x;
 
-        for (uint i; i < totalSupply; i++) {
+        for (uint i = 1; i < y; i++) {
             if (ownerOf(i) == owner) {
                 tokens[x] = i;
                 x++;
