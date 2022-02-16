@@ -16,23 +16,21 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
 
     constructor(
         uint _royalty, 
-        address _openseaAddr,
-        address _raribleAddr,
-        address _looksRareAddr,
+        address _openseaProxyRegistry,
         string memory _tempBaseURI
-    ) ERC721(_openseaAddr, _raribleAddr, _looksRareAddr, _tempBaseURI) {
+    ) ERC721(_openseaProxyRegistry, _tempBaseURI) {
         EIP2981RoyaltyPercent = _royalty;
     }
     
     function mintFromReserve(uint amount, address to) external onlyOwner {
-        require(amount + totalSupply < 500);
+        require(amount + totalSupply <= 500);
         _mint(amount, to);
     }
 
     function mint(uint256 amount) external payable {
         require(_mintingEnabled, "Minting is not enabled!");
         require(amount <= 20 && amount != 0, "Invalid request amount!");
-        require(totalSupply + amount < 10_001, "Request exceeds max supply!");
+        require(amount + totalSupply <= 10_000, "Request exceeds max supply!");
         require(msg.value == amount * 89e15, "ETH Amount is not correct!");
 
         _mint(amount, msg.sender);
@@ -40,7 +38,7 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
 
     function preMint(bytes calldata sig, uint256 amount) external payable {
         require(_onlyMagicList, "Minting is not enabled!");
-        require(checkSig(msg.sender, sig), "User not whitelisted!");
+        require(_checkSig(msg.sender, sig), "User not whitelisted!");
         require(amount + amountMinted[msg.sender] <= 10 && amount != 0, "Request exceeds max per wallet!");
         require(msg.value == amount * 69e15, "ETH Amount is not correct!");
 
@@ -48,7 +46,7 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
         _mint(amount, msg.sender);
     }
 
-    function checkSig(address _wallet, bytes memory _signature) public view returns(bool) {
+    function _checkSig(address _wallet, bytes memory _signature) private view returns(bool) {
         return ECDSA.recover(
             ECDSA.toEthSignedMessageHash(keccak256(abi.encodePacked(_wallet))),
             _signature

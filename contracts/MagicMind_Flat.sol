@@ -644,9 +644,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
 
     uint16 public totalSupply;
 
-    address private _openseaContract;
-    address private _raribleContract;
-    address private _looksRareContract;
+    address public proxyRegistryAddress;
 
     string private baseURI;
 
@@ -663,10 +661,8 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
 
-    constructor(address _opensea, address _rarible, address _looksRare, string memory _baseURI) {
-        _openseaContract = _opensea;
-        _raribleContract = _rarible;
-        _looksRareContract = _looksRare;
+    constructor(address _openseaProxyRegistry, string memory _baseURI) {
+        proxyRegistryAddress = _openseaProxyRegistry;
         baseURI = _baseURI;
     }
 
@@ -678,10 +674,6 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC721Metadata).interfaceId ||
             super.supportsInterface(interfaceId);
-    }
-
-    function getBaseURI() external view returns(string memory) {
-        return baseURI;
     }
 
     /**
@@ -763,27 +755,17 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
      * @dev See {IERC721-isApprovedForAll}.
      */
     function isApprovedForAll(address owner, address operator) public view returns (bool) {
-        return
-            operator ==  _openseaContract ||
-            operator == _raribleContract ||
-            operator == _looksRareContract ||
-            _operatorApprovals[owner][operator];
+        // Whitelist OpenSea proxy contract for easy trading.
+        ProxyRegistry proxyRegistry = ProxyRegistry(proxyRegistryAddress);
+        if (address(proxyRegistry.proxies(owner)) == operator) {
+            return true;
+        }
+
+        return _operatorApprovals[owner][operator];
     }
 
-    function setOpenseaContract(address addr) external onlyOwner {
-        _openseaContract = addr;
-    }
-
-    function setRaribleContract(address addr) external onlyOwner {
-        _raribleContract = addr;
-    }
-
-    function setLooksRareContract(address addr) external onlyOwner {
-        _looksRareContract = addr;
-    }
-
-    function getMarketplaceContracts() external view returns(address opensea, address rarible, address looksRare) {
-        return(_openseaContract, _raribleContract, _looksRareContract);
+    function setOpenseaProxyRegistry(address addr) external onlyOwner {
+        proxyRegistryAddress = addr;
     }
 
     /**
@@ -998,6 +980,15 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
 
 }
 
+contract OwnableDelegateProxy {}
+
+/**
+ * Used to delegate ownership of a contract to another address, to save on unneeded transactions to approve contract use for users
+ */
+contract ProxyRegistry {
+    mapping(address => OwnableDelegateProxy) public proxies;
+}
+
 // File: contracts/MagicMind.sol
 
 contract MagicMind is Ownable, IERC2981, ERC721 {
@@ -1011,23 +1002,21 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
 
     constructor(
         uint _royalty, 
-        address _openseaAddr,
-        address _raribleAddr,
-        address _looksRareAddr,
+        address _openseaProxyRegistry,
         string memory _tempBaseURI
-    ) ERC721(_openseaAddr, _raribleAddr, _looksRareAddr, _tempBaseURI) {
+    ) ERC721(_openseaProxyRegistry, _tempBaseURI) {
         EIP2981RoyaltyPercent = _royalty;
     }
     
     function mintFromReserve(uint amount, address to) external onlyOwner {
-        require(amount + totalSupply < 500);
+        require(amount + totalSupply <= 500);
         _mint(amount, to);
     }
 
     function mint(uint256 amount) external payable {
         require(_mintingEnabled, "Minting is not enabled!");
         require(amount <= 20 && amount != 0, "Invalid request amount!");
-        require(totalSupply + amount < 10_001, "Request exceeds max supply!");
+        require(amount + totalSupply <= 10_000, "Request exceeds max supply!");
         require(msg.value == amount * 89e15, "ETH Amount is not correct!");
 
         _mint(amount, msg.sender);
@@ -1035,7 +1024,7 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
 
     function preMint(bytes calldata sig, uint256 amount) external payable {
         require(_onlyMagicList, "Minting is not enabled!");
-        require(checkSig(msg.sender, sig), "User not whitelisted!");
+        require(_checkSig(msg.sender, sig), "User not whitelisted!");
         require(amount + amountMinted[msg.sender] <= 10 && amount != 0, "Request exceeds max per wallet!");
         require(msg.value == amount * 69e15, "ETH Amount is not correct!");
 
@@ -1043,7 +1032,7 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
         _mint(amount, msg.sender);
     }
 
-    function checkSig(address _wallet, bytes memory _signature) public view returns(bool) {
+    function _checkSig(address _wallet, bytes memory _signature) private view returns(bool) {
         return ECDSA.recover(
             ECDSA.toEthSignedMessageHash(keccak256(abi.encodePacked(_wallet))),
             _signature

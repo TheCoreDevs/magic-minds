@@ -21,9 +21,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
 
     uint16 public totalSupply;
 
-    address private _openseaContract;
-    address private _raribleContract;
-    address private _looksRareContract;
+    address public proxyRegistryAddress;
 
     string private baseURI;
 
@@ -40,10 +38,8 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
 
-    constructor(address _opensea, address _rarible, address _looksRare, string memory _baseURI) {
-        _openseaContract = _opensea;
-        _raribleContract = _rarible;
-        _looksRareContract = _looksRare;
+    constructor(address _openseaProxyRegistry, string memory _baseURI) {
+        proxyRegistryAddress = _openseaProxyRegistry;
         baseURI = _baseURI;
     }
 
@@ -136,27 +132,17 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
      * @dev See {IERC721-isApprovedForAll}.
      */
     function isApprovedForAll(address owner, address operator) public view returns (bool) {
-        return
-            operator ==  _openseaContract ||
-            operator == _raribleContract ||
-            operator == _looksRareContract ||
-            _operatorApprovals[owner][operator];
+        // Whitelist OpenSea proxy contract for easy trading.
+        ProxyRegistry proxyRegistry = ProxyRegistry(proxyRegistryAddress);
+        if (address(proxyRegistry.proxies(owner)) == operator) {
+            return true;
+        }
+
+        return _operatorApprovals[owner][operator];
     }
 
-    function setOpenseaContract(address addr) external onlyOwner {
-        _openseaContract = addr;
-    }
-
-    function setRaribleContract(address addr) external onlyOwner {
-        _raribleContract = addr;
-    }
-
-    function setLooksRareContract(address addr) external onlyOwner {
-        _looksRareContract = addr;
-    }
-
-    function getMarketplaceContracts() external view returns(address opensea, address rarible, address looksRare) {
-        return(_openseaContract, _raribleContract, _looksRareContract);
+    function setOpenseaProxyRegistry(address addr) external onlyOwner {
+        proxyRegistryAddress = addr;
     }
 
     /**
@@ -369,4 +355,13 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
         }
     }
 
+}
+
+contract OwnableDelegateProxy {}
+
+/**
+ * Used to delegate ownership of a contract to another address, to save on unneeded transactions to approve contract use for users
+ */
+contract ProxyRegistry {
+    mapping(address => OwnableDelegateProxy) public proxies;
 }
