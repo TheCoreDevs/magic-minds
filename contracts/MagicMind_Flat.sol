@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
+ 
+pragma solidity ^0.8.7;
 
-pragma solidity ^0.8.11;
 
 // File: contracts/Ownable.sol
 
@@ -15,8 +16,8 @@ pragma solidity ^0.8.11;
  * This module is used through inheritance. It will make available the modifier
  * `onlyOwner`, which can be applied to your functions to restrict their use to
  * the owner.
- *
- * Source: Openzeppelin
+ * 
+ * Source: openzeppelin
  */
 abstract contract Ownable {
     address private _owner;
@@ -52,7 +53,7 @@ abstract contract Ownable {
      * NOTE: Renouncing ownership will leave the contract without an owner,
      * thereby removing any functionality that is only available to the owner.
      */
-    function renounceOwnership() public virtual onlyOwner {
+    function renounceOwnership() external virtual onlyOwner {
         _setOwner(address(0));
     }
 
@@ -60,7 +61,7 @@ abstract contract Ownable {
      * @dev Transfers ownership of the contract to a new account (`newOwner`).
      * Can only be called by the current owner.
      */
-    function transferOwnership(address newOwner) public virtual onlyOwner {
+    function transferOwnership(address newOwner) external virtual onlyOwner {
         require(newOwner != address(0), "Ownable: new owner is the zero address");
         _setOwner(newOwner);
     }
@@ -72,6 +73,8 @@ abstract contract Ownable {
     }
 }
 
+// File: Strings.sol
+
 /**
  * Source: Openzeppelin
  */
@@ -80,7 +83,6 @@ abstract contract Ownable {
  * @dev String operations.
  */
 library Strings {
-    bytes16 private constant _HEX_SYMBOLS = "0123456789abcdef";
 
     /**
      * @dev Converts a `uint256` to its ASCII `string` decimal representation.
@@ -106,41 +108,12 @@ library Strings {
         }
         return string(buffer);
     }
-
-    /**
-     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation.
-     */
-    function toHexString(uint256 value) internal pure returns (string memory) {
-        if (value == 0) {
-            return "0x00";
-        }
-        uint256 temp = value;
-        uint256 length = 0;
-        while (temp != 0) {
-            length++;
-            temp >>= 8;
-        }
-        return toHexString(value, length);
-    }
-
-    /**
-     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation with fixed length.
-     */
-    function toHexString(uint256 value, uint256 length) internal pure returns (string memory) {
-        bytes memory buffer = new bytes(2 * length + 2);
-        buffer[0] = "0";
-        buffer[1] = "x";
-        for (uint256 i = 2 * length + 1; i > 1; --i) {
-            buffer[i] = _HEX_SYMBOLS[value & 0xf];
-            value >>= 4;
-        }
-        require(value == 0, "Strings: hex length insufficient");
-        return string(buffer);
-    }
 }
 
+// File: ECDSA.sol
 
 // OpenZeppelin Contracts v4.4.0 (utils/cryptography/ECDSA.sol)
+
 
 /**
  * @dev Elliptic Curve Digital Signature Algorithm (ECDSA) operations.
@@ -264,21 +237,6 @@ library ECDSA {
     }
 
     /**
-     * @dev Overload of {ECDSA-recover} that receives the `r and `vs` short-signature fields separately.
-     *
-     * _Available since v4.2._
-     */
-    function recover(
-        bytes32 hash,
-        bytes32 r,
-        bytes32 vs
-    ) internal pure returns (address) {
-        (address recovered, RecoverError error) = tryRecover(hash, r, vs);
-        _throwError(error);
-        return recovered;
-    }
-
-    /**
      * @dev Overload of {ECDSA-tryRecover} that receives the `v`,
      * `r` and `s` signature fields separately.
      *
@@ -316,21 +274,6 @@ library ECDSA {
     }
 
     /**
-     * @dev Overload of {ECDSA-recover} that receives the `v`,
-     * `r` and `s` signature fields separately.
-     */
-    function recover(
-        bytes32 hash,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) internal pure returns (address) {
-        (address recovered, RecoverError error) = tryRecover(hash, v, r, s);
-        _throwError(error);
-        return recovered;
-    }
-
-    /**
      * @dev Returns an Ethereum Signed Message, created from a `hash`. This
      * produces hash corresponding to the one signed with the
      * https://eth.wiki/json-rpc/API#eth_sign[`eth_sign`]
@@ -344,34 +287,9 @@ library ECDSA {
         return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
     }
 
-    /**
-     * @dev Returns an Ethereum Signed Message, created from `s`. This
-     * produces hash corresponding to the one signed with the
-     * https://eth.wiki/json-rpc/API#eth_sign[`eth_sign`]
-     * JSON-RPC method as part of EIP-191.
-     *
-     * See {recover}.
-     */
-    function toEthSignedMessageHash(bytes memory s) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n", Strings.toString(s.length), s));
-    }
-
-    /**
-     * @dev Returns an Ethereum Signed Typed Data, created from a
-     * `domainSeparator` and a `structHash`. This produces hash corresponding
-     * to the one signed with the
-     * https://eips.ethereum.org/EIPS/eip-712[`eth_signTypedData`]
-     * JSON-RPC method as part of EIP-712.
-     *
-     * See {recover}.
-     */
-    function toTypedDataHash(bytes32 domainSeparator, bytes32 structHash) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
-    }
 }
 
-// File: contracts/Address.sol
-
+// File: Address.sol0
 
 /**
  * Source: Openzeppelin
@@ -411,7 +329,7 @@ library Address {
     }
 }
 
-// File: contracts/IERC721Receiver.sol
+// File: IERC721Receiver.sol
 
 /**
  * @title ERC721 token receiver interface
@@ -436,10 +354,9 @@ interface IERC721Receiver {
     ) external returns (bytes4);
 }
 
-// File: contracts/IERC165.sol
+// File: IERC165.sol
 
 // https://eips.ethereum.org/EIPS/eip-165 
-
 
 
 interface IERC165 {
@@ -452,7 +369,12 @@ interface IERC165 {
     function supportsInterface(bytes4 interfaceID) external view returns (bool);
 }
 
-// File: contracts/IERC2981.sol
+// File: IERC2981.sol
+
+
+/**
+ * Source: Openzeppelin
+ */
 
 
 /**
@@ -472,7 +394,7 @@ interface IERC2981 is IERC165 {
         returns (address receiver, uint256 royaltyAmount);
 }
 
-// File: contracts/ERC165.sol
+// File: ERC165.sol
 
 
 /**
@@ -503,9 +425,10 @@ abstract contract ERC165 is IERC165 {
     }
 }
 
-// File: contracts/IERC721.sol
+// File: IERC721.sol
 
 // https://eips.ethereum.org/EIPS/eip-721, http://erc721.org/ 
+
 
 /// @title ERC-721 Non-Fungible Token Standard
 /// @dev See https://eips.ethereum.org/EIPS/eip-721
@@ -605,7 +528,7 @@ interface IERC721 is IERC165 {
     function isApprovedForAll(address _owner, address _operator) external view returns (bool);
 }
 
-// File: contracts/IERC721Metadata.sol
+// File: IERC721Metadata.sol
 
 
 /**
@@ -629,13 +552,11 @@ interface IERC721Metadata is IERC721 {
     function tokenURI(uint256 tokenId) external view returns (string memory);
 }
 
-// File: contracts/ERC721.sol
-
-
+// File: ERC721.sol
 
 /**
  * @dev Implementation of https://eips.ethereum.org/EIPS/eip-721[ERC721] Non-Fungible Token Standard, including
- * the Metadata extension.
+ * the Metadata extension
  * Made for efficiancy!
  */
 contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
@@ -679,7 +600,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     /**
      * @dev See {IERC721-balanceOf}.
      */
-    function balanceOf(address owner) public view returns (uint256) {
+    function balanceOf(address owner) external view returns (uint256) {
         require(owner != address(0), "ERC721: balance query for the zero address");
         return _balances[owner];
     }
@@ -696,21 +617,21 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     /**
      * @dev See {IERC721Metadata-name}.
      */
-    function name() public pure returns (string memory) {
+    function name() external pure returns (string memory) {
         return "Magic Mind";
     }
 
     /**
      * @dev See {IERC721Metadata-symbol}.
      */
-    function symbol() public pure returns (string memory) {
+    function symbol() external pure returns (string memory) {
         return "MIND";
     }
 
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
-    function tokenURI(uint256 tokenId) public view returns (string memory) {
+    function tokenURI(uint256 tokenId) external view returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
         return string(abi.encodePacked(baseURI, tokenId.toString(), ".json"));
@@ -723,7 +644,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     /**
      * @dev See {IERC721-approve}.
      */
-    function approve(address to, uint256 tokenId) public {
+    function approve(address to, uint256 tokenId) external {
         address owner = _owners[tokenId];
         require(to != owner, "ERC721: approval to current owner");
 
@@ -747,7 +668,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     /**
      * @dev See {IERC721-setApprovalForAll}.
      */
-    function setApprovalForAll(address operator, bool approved) public {
+    function setApprovalForAll(address operator, bool approved) external {
         _setApprovalForAll(msg.sender, operator, approved);
     }
 
@@ -775,7 +696,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
         address from,
         address to,
         uint256 tokenId
-    ) public {
+    ) external {
         //solhint-disable-next-line max-line-length
         require(_isApprovedOrOwner(msg.sender, tokenId), "ERC721: transfer caller is not owner nor approved");
 
@@ -789,7 +710,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
         address from,
         address to,
         uint256 tokenId
-    ) public {
+    ) external {
         safeTransferFrom(from, to, tokenId, "");
     }
 
@@ -854,7 +775,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
      */
     function _isApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
         require(_exists(tokenId), "ERC721: operator query for nonexistent token");
-        address owner = ERC721.ownerOf(tokenId);
+        address owner = _owners[tokenId];
         return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll(owner, spender));
     }
 
@@ -880,14 +801,14 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
 
             _owners[tokenId] = to;
             emit Transfer(address(0), to, tokenId);
-
-            require(
-                _checkOnERC721Received(address(0), to, tokenId, ""),
-                "ERC721: transfer to non ERC721Receiver implementer"
-            );
         }
-
+        
         totalSupply += uint16(amount);
+
+        require(
+            _checkOnERC721Received(address(0), to, tokenId, ""),
+            "ERC721: transfer to non ERC721Receiver implementer"
+        ); // checking it once will make sure that the address can recieve NFTs
     }
 
     /**
@@ -906,7 +827,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
         address to,
         uint256 tokenId
     ) internal virtual {
-        require(ERC721.ownerOf(tokenId) == from, "ERC721: transfer from incorrect owner");
+        require(_owners[tokenId] == from, "ERC721: transfer from incorrect owner");
         require(to != address(0), "ERC721: transfer to the zero address");
 
         // Clear approvals from the previous owner
@@ -982,14 +903,13 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
 
 contract OwnableDelegateProxy {}
 
-/**
- * Used to delegate ownership of a contract to another address, to save on unneeded transactions to approve contract use for users
- */
 contract ProxyRegistry {
     mapping(address => OwnableDelegateProxy) public proxies;
 }
 
-// File: contracts/MagicMind.sol
+
+// File: MagicMind.sol
+
 
 contract MagicMind is Ownable, IERC2981, ERC721 {
     
@@ -1111,7 +1031,7 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
     }
 
     function tokensOfOwner(address owner) external view returns(uint[] memory) {
-        uint[] memory tokens = new uint[](balanceOf(owner));
+        uint[] memory tokens = new uint[](_balances[owner]);
         uint y = totalSupply + 1;
         uint x;
 

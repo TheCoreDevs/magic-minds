@@ -1,0 +1,5 @@
+test
+migrations
+.vscode
+truffle-config.js
+build

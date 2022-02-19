@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.7;
 
 import "./IERC721.sol";
 import "./IERC721Receiver.sol";
@@ -56,7 +56,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     /**
      * @dev See {IERC721-balanceOf}.
      */
-    function balanceOf(address owner) public view returns (uint256) {
+    function balanceOf(address owner) external view returns (uint256) {
         require(owner != address(0), "ERC721: balance query for the zero address");
         return _balances[owner];
     }
@@ -73,21 +73,21 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     /**
      * @dev See {IERC721Metadata-name}.
      */
-    function name() public pure returns (string memory) {
+    function name() external pure returns (string memory) {
         return "Magic Mind";
     }
 
     /**
      * @dev See {IERC721Metadata-symbol}.
      */
-    function symbol() public pure returns (string memory) {
+    function symbol() external pure returns (string memory) {
         return "MIND";
     }
 
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
-    function tokenURI(uint256 tokenId) public view returns (string memory) {
+    function tokenURI(uint256 tokenId) external view returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
         return string(abi.encodePacked(baseURI, tokenId.toString(), ".json"));
@@ -100,7 +100,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     /**
      * @dev See {IERC721-approve}.
      */
-    function approve(address to, uint256 tokenId) public {
+    function approve(address to, uint256 tokenId) external {
         address owner = _owners[tokenId];
         require(to != owner, "ERC721: approval to current owner");
 
@@ -124,7 +124,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     /**
      * @dev See {IERC721-setApprovalForAll}.
      */
-    function setApprovalForAll(address operator, bool approved) public {
+    function setApprovalForAll(address operator, bool approved) external {
         _setApprovalForAll(msg.sender, operator, approved);
     }
 
@@ -152,7 +152,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
         address from,
         address to,
         uint256 tokenId
-    ) public {
+    ) external {
         //solhint-disable-next-line max-line-length
         require(_isApprovedOrOwner(msg.sender, tokenId), "ERC721: transfer caller is not owner nor approved");
 
@@ -166,7 +166,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
         address from,
         address to,
         uint256 tokenId
-    ) public {
+    ) external {
         safeTransferFrom(from, to, tokenId, "");
     }
 
@@ -231,7 +231,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
      */
     function _isApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
         require(_exists(tokenId), "ERC721: operator query for nonexistent token");
-        address owner = ERC721.ownerOf(tokenId);
+        address owner = _owners[tokenId];
         return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll(owner, spender));
     }
 
@@ -257,14 +257,14 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
 
             _owners[tokenId] = to;
             emit Transfer(address(0), to, tokenId);
-
-            require(
-                _checkOnERC721Received(address(0), to, tokenId, ""),
-                "ERC721: transfer to non ERC721Receiver implementer"
-            );
         }
-
+        
         totalSupply += uint16(amount);
+
+        require(
+            _checkOnERC721Received(address(0), to, tokenId, ""),
+            "ERC721: transfer to non ERC721Receiver implementer"
+        ); // checking it once will make sure that the address can recieve NFTs
     }
 
     /**
@@ -283,7 +283,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
         address to,
         uint256 tokenId
     ) internal virtual {
-        require(ERC721.ownerOf(tokenId) == from, "ERC721: transfer from incorrect owner");
+        require(_owners[tokenId] == from, "ERC721: transfer from incorrect owner");
         require(to != address(0), "ERC721: transfer to the zero address");
 
         // Clear approvals from the previous owner

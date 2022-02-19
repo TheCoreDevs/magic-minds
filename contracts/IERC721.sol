@@ -1,6 +1,6 @@
 // https://eips.ethereum.org/EIPS/eip-721, http://erc721.org/ 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.7;
 
 import "./IERC165.sol";
 

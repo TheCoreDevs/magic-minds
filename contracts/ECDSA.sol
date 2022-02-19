@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts v4.4.0 (utils/cryptography/ECDSA.sol)
 
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.7;
 
 import "./Strings.sol";
 
@@ -127,21 +127,6 @@ library ECDSA {
     }
 
     /**
-     * @dev Overload of {ECDSA-recover} that receives the `r and `vs` short-signature fields separately.
-     *
-     * _Available since v4.2._
-     */
-    function recover(
-        bytes32 hash,
-        bytes32 r,
-        bytes32 vs
-    ) internal pure returns (address) {
-        (address recovered, RecoverError error) = tryRecover(hash, r, vs);
-        _throwError(error);
-        return recovered;
-    }
-
-    /**
      * @dev Overload of {ECDSA-tryRecover} that receives the `v`,
      * `r` and `s` signature fields separately.
      *
@@ -179,21 +164,6 @@ library ECDSA {
     }
 
     /**
-     * @dev Overload of {ECDSA-recover} that receives the `v`,
-     * `r` and `s` signature fields separately.
-     */
-    function recover(
-        bytes32 hash,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) internal pure returns (address) {
-        (address recovered, RecoverError error) = tryRecover(hash, v, r, s);
-        _throwError(error);
-        return recovered;
-    }
-
-    /**
      * @dev Returns an Ethereum Signed Message, created from a `hash`. This
      * produces hash corresponding to the one signed with the
      * https://eth.wiki/json-rpc/API#eth_sign[`eth_sign`]
@@ -207,28 +177,4 @@ library ECDSA {
         return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
     }
 
-    /**
-     * @dev Returns an Ethereum Signed Message, created from `s`. This
-     * produces hash corresponding to the one signed with the
-     * https://eth.wiki/json-rpc/API#eth_sign[`eth_sign`]
-     * JSON-RPC method as part of EIP-191.
-     *
-     * See {recover}.
-     */
-    function toEthSignedMessageHash(bytes memory s) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n", Strings.toString(s.length), s));
-    }
-
-    /**
-     * @dev Returns an Ethereum Signed Typed Data, created from a
-     * `domainSeparator` and a `structHash`. This produces hash corresponding
-     * to the one signed with the
-     * https://eips.ethereum.org/EIPS/eip-712[`eth_signTypedData`]
-     * JSON-RPC method as part of EIP-712.
-     *
-     * See {recover}.
-     */
-    function toTypedDataHash(bytes32 domainSeparator, bytes32 structHash) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
-    }
 }

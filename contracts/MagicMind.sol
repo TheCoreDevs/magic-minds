@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.7;
 
 import "./ERC721.sol";
 import "./ECDSA.sol";
@@ -125,7 +125,7 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
     }
 
     function tokensOfOwner(address owner) external view returns(uint[] memory) {
-        uint[] memory tokens = new uint[](balanceOf(owner));
+        uint[] memory tokens = new uint[](_balances[owner]);
         uint y = totalSupply + 1;
         uint x;
 

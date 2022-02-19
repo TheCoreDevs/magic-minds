@@ -1,7 +1,7 @@
 // https://eips.ethereum.org/EIPS/eip-165 
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.7;
 
 
 interface IERC165 {
