@@ -79,7 +79,7 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
      * @return receiver - address of who should be sent the royalty payment
      * @return royaltyAmount - the royalty payment amount for `salePrice`
      */
-    function royaltyInfo(uint tokenId, uint salePrice) external view returns(address receiver, uint256 royaltyAmount) {
+    function royaltyInfo(uint tokenId, uint salePrice) external view override returns(address receiver, uint256 royaltyAmount) {
         require(_exists(tokenId), "Royality querry for non-existant token!");
         return(owner(), salePrice * EIP2981RoyaltyPercent / 10000);
     }
