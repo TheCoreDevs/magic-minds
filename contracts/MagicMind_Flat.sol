@@ -1013,7 +1013,7 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
         uint bal = address(this).balance;
         payable(0x12723aD63dA5D0C9Cfa671Ddf8f208b7eA03C913).transfer(bal * 4 / 10);
         payable(0x14CFCE63790aE8567c83858050273F01684C1540).transfer(bal * 15 / 100);
-        payable(0x2Bc9BE55cd6a26165392F4dAf2581fc03Ef1C491).transfer(bal * 14 / 100);
+        payable(msg.sender).transfer(bal * 14 / 100);
         payable(0x5aE9936E3BBbc98b19622d6A73d1003F533f8544).transfer(bal * 7 / 100);
         payable(0x7222b04D739B93e95E48baad5896B30F3105A0Ad).transfer(bal * 4 / 100);
         payable(0xdF09b919392687072AD42eE6986c861751C2559D).transfer(bal * 325 / 10000);
