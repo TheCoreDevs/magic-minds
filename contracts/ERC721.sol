@@ -337,7 +337,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
         address to,
         uint256 tokenId,
         bytes memory _data
-    ) private returns (bool) {
+    ) internal returns (bool) {
         if (to.isContract()) {
             try IERC721Receiver(to).onERC721Received(msg.sender, from, tokenId, _data) returns (bytes4 retval) {
                 return retval == IERC721Receiver.onERC721Received.selector;

@@ -27,6 +27,42 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
         _mint(amount, to);
     }
 
+    function batchMintFromReserve(uint[] memory amount, address[] memory to) external onlyOwner {
+        uint length = amount.length;
+        require(length == to.length, "array length missmatch");
+        
+        uint tokenId = totalSupply;
+        uint total;
+
+        uint cAmount;
+        address cTo;
+
+        for (uint i; i < length; i++) {
+
+            assembly {
+                cAmount := mload(add(add(amount, 0x20), mul(i, 0x20)))
+                cTo := mload(add(add(to, 0x20), mul(i, 0x20)))
+            }
+
+            require(!Address.isContract(cTo), "Cannot mint to contracts!");
+
+            _balances[cTo] += cAmount;
+            
+            for (uint f; f < cAmount; f++) {
+                tokenId++;
+
+                _owners[tokenId] = cTo;
+                emit Transfer(address(0), cTo, tokenId);
+            }
+            
+            total += cAmount;
+        }
+
+        require(tokenId <= 500, "Exceeds reserve!");
+        
+        totalSupply = uint16(total);
+    }
+
     function mint(uint256 amount) external payable {
         require(_mintingEnabled, "Minting is not enabled!");
         require(amount <= 20 && amount != 0, "Invalid request amount!");

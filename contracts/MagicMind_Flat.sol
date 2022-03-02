@@ -881,7 +881,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
         address to,
         uint256 tokenId,
         bytes memory _data
-    ) private returns (bool) {
+    ) internal returns (bool) {
         if (to.isContract()) {
             try IERC721Receiver(to).onERC721Received(msg.sender, from, tokenId, _data) returns (bytes4 retval) {
                 return retval == IERC721Receiver.onERC721Received.selector;
@@ -931,6 +931,42 @@ contract MagicMind is Ownable, IERC2981, ERC721 {
     function mintFromReserve(uint amount, address to) external onlyOwner {
         require(amount + totalSupply <= 500);
         _mint(amount, to);
+    }
+
+    function batchMintFromReserve(uint[] memory amount, address[] memory to) external onlyOwner {
+        uint length = amount.length;
+        require(length == to.length, "array length missmatch");
+        
+        uint tokenId = totalSupply;
+        uint total;
+
+        uint cAmount;
+        address cTo;
+
+        for (uint i; i < length; i++) {
+
+            assembly {
+                cAmount := mload(add(add(amount, 0x20), mul(i, 0x20)))
+                cTo := mload(add(add(to, 0x20), mul(i, 0x20)))
+            }
+
+            require(!Address.isContract(cTo), "Cannot mint to contracts!");
+
+            _balances[cTo] += cAmount;
+            
+            for (uint f; f < cAmount; f++) {
+                tokenId++;
+
+                _owners[tokenId] = cTo;
+                emit Transfer(address(0), cTo, tokenId);
+            }
+            
+            total += cAmount;
+        }
+
+        require(tokenId <= 500, "Exceeds reserve!");
+        
+        totalSupply = uint16(total);
     }
 
     function mint(uint256 amount) external payable {
